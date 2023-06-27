@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+/*
         FirebaseDatabase.getInstance().setPersistenceEnabled(true); // work offline
         Objects.requireNonNull(getSupportActionBar()).hide();
 
@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        readData();
 
 
+*/
 
 
 
@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
         //////////////////////////////////////////////////////////////////////////////////////////
 
         auth = FirebaseAuth.getInstance();
+
+        String id =auth.getCurrentUser().getUid();
+        //readData(id);
         logout = findViewById(R.id.btn_logout);
         user = auth.getCurrentUser();
         userdetails = findViewById(R.id.userdetails);
@@ -109,10 +112,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void readData() {
-        String id =auth.getCurrentUser().getUid();
+    private void readData(String id) {
 
-        databaseReference.child(id).orderByChild("fecha").addValueEventListener(new ValueEventListener() {
+
+        databaseReference.child(id).child("actividades").orderByChild("fecha").addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -135,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public class ViewDialogAdd {
         public void showDialog(Context context) {
+            String id_auth =auth.getCurrentUser().getUid();
             final Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setCancelable(false);
@@ -160,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             buttonAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String id = "activity" + new Date().getTime();
+                    String id_new = "activity" + new Date().getTime();
                     String name = textNameadd.getText().toString();
 
 
@@ -177,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                     if (name.isEmpty() || fechaTexto.isEmpty() || inicioTexto.isEmpty() || finTexto.isEmpty()) {
                         Toast.makeText(context, "LLene todos los datos", Toast.LENGTH_SHORT).show();
                     } else {
-                        databaseReference.child(id).child("actividades").setValue(new ActividadItem(id, name, fechaTexto, inicioTexto,finTexto));
+                        databaseReference.child(id_auth).child("actividades").setValue(new ActividadItem(id_new, name, fechaTexto, inicioTexto,finTexto));
                         Toast.makeText(context, "Hecho!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
