@@ -84,7 +84,7 @@ public class Register extends AppCompatActivity {
                                     Toast.makeText(Register.this, "Cuenta creada mauth", Toast.LENGTH_SHORT).show();
 
 //realtime
-                                    String id =mAuth.getCurrentUser().getUid();
+                                    String id =mAuth.getCurrentUser().getUid();//IDENTIFICADOR DEL USUARIO,DEL AUTENTICADOR , PARA REALTIME
                                     databaseReference.child(id).setValue(usuario).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task2) {

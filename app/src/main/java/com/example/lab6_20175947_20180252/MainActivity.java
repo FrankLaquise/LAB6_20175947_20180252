@@ -110,8 +110,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void readData() {
+        String id =auth.getCurrentUser().getUid();
 
-        databaseReference.child("ACTIVIDADES").orderByChild("nameActivity").addValueEventListener(new ValueEventListener() {
+        databaseReference.child(id).orderByChild("fecha").addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -159,24 +160,24 @@ public class MainActivity extends AppCompatActivity {
             buttonAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String id = "user" + new Date().getTime();
+                    String id = "activity" + new Date().getTime();
                     String name = textNameadd.getText().toString();
 
 
 
                     String fechaTexto = textFechaadd.getText().toString();
-                    LocalDate fecha = LocalDate.parse(fechaTexto);
+                    //LocalDate fecha = LocalDate.parse(fechaTexto);
 
                     String inicioTexto = textInicioadd.getText().toString();
-                    LocalTime inicio = LocalTime.parse(inicioTexto);
+                    //LocalTime inicio = LocalTime.parse(inicioTexto);
 
                     String finTexto = textFinadd.getText().toString();
-                    LocalTime ffinal = LocalTime.parse(finTexto);
+                    //LocalTime ffinal = LocalTime.parse(finTexto);
 
-                    if (name.isEmpty() || fecha==null || inicio==null || ffinal==null) {
+                    if (name.isEmpty() || fechaTexto.isEmpty() || inicioTexto.isEmpty() || finTexto.isEmpty()) {
                         Toast.makeText(context, "LLene todos los datos", Toast.LENGTH_SHORT).show();
                     } else {
-                        databaseReference.child("ACTIVIDADES").child(id).setValue(new ActividadItem(id, name, fecha, inicio,ffinal));
+                        databaseReference.child(id).child("actividades").setValue(new ActividadItem(id, name, fechaTexto, inicioTexto,finTexto));
                         Toast.makeText(context, "Hecho!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
