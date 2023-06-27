@@ -21,12 +21,13 @@
 
     <Button
         android:id="@+id/btn_logout"
-        android:layout_width="350dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="600dp"
+        android:layout_width="332dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="624dp"
         android:backgroundTint="#CA2C3A"
         android:text="Cerrar Sesión"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Actividades" />
 
@@ -34,9 +35,51 @@
         android:id="@+id/userdetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="24dp"
         android:text="TextView"
         android:textColor="#000000"
-        app:layout_constraintTop_toBottomOf="@+id/Actividades"
-        tools:layout_editor_absoluteX="57dp" />
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/Actividades" />
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="5dp"
+        android:text="Correo usuario:"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/userdetails"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Actividades" />
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="555dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Actividades">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonAdd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@android:color/holo_green_dark"
+            android:text="Agregar Actividad"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
