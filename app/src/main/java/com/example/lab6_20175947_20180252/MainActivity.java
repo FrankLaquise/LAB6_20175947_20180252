@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -19,6 +20,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,11 +29,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,43 +60,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true); // work offline
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        usersItemArrayList = new ArrayList<>();
-
-
-        buttonAdd = findViewById(R.id.buttonAdd);
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ViewDialogAdd viewDialogAdd = new ViewDialogAdd();
-                viewDialogAdd.showDialog(MainActivity.this);
-
-            }
-        });
-
-
-*/
-
-
-
-
-
 
         //////////////////////////////////////////////////////////////////////////////////////////
-
+        //INICIAR SESION :
         auth = FirebaseAuth.getInstance();
-
-        String id =auth.getCurrentUser().getUid();
-        //readData(id);
         logout = findViewById(R.id.btn_logout);
         user = auth.getCurrentUser();
         userdetails = findViewById(R.id.userdetails);
@@ -102,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             userdetails.setText(user.getEmail());
 
         }
+        //CERRAR SESION:
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,11 +86,27 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+//////
+
+
+
+        buttonAdd = findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewDialogAdd viewDialogAdd = new ViewDialogAdd();
+                viewDialogAdd.showDialog(MainActivity.this);
+
+            }
+        });
+
+        //readData();
     }
-    private void readData(String id) {
+    private void readData() {
 
 
-        databaseReference.child(id).child("actividades").orderByChild("fecha").addValueEventListener(new ValueEventListener() {
+        String id =auth.getCurrentUser().getUid();
+        databaseReference.child(id).child("actividades").addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -136,14 +127,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    //AGREGAR ACTIVIDAD (VISTA)
     public class ViewDialogAdd {
         public void showDialog(Context context) {
             String id_auth =auth.getCurrentUser().getUid();
+
+            /////////////VIDEO:
             final Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setCancelable(false);
             dialog.setContentView(R.layout.add_new_activity);
-
+//BIEN
             EditText textNameadd = dialog.findViewById(R.id.textNameAdd);
             EditText textFechaadd = dialog.findViewById(R.id.textFechaAdd);
             EditText textInicioadd = dialog.findViewById(R.id.textInicioAdd);
@@ -152,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
 
             Button buttonAdd = dialog.findViewById(R.id.buttonAdd);
             Button buttonCancel = dialog.findViewById(R.id.buttonCancel);
+            //
 
-            buttonAdd.setText("Agregar");
+            buttonAdd.setText("Agregar");//BIEN
             buttonCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -166,24 +162,43 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     String id_new = "activity" + new Date().getTime();
                     String name = textNameadd.getText().toString();
-
-
-
                     String fechaTexto = textFechaadd.getText().toString();
                     //LocalDate fecha = LocalDate.parse(fechaTexto);
-
                     String inicioTexto = textInicioadd.getText().toString();
                     //LocalTime inicio = LocalTime.parse(inicioTexto);
-
                     String finTexto = textFinadd.getText().toString();
                     //LocalTime ffinal = LocalTime.parse(finTexto);
+
+                    //
+                    String id = auth.getCurrentUser().getUid();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("titulo", name);
+                    map.put("fecha", fechaTexto);
+                    map.put("hora_inicio", inicioTexto);
+                    map.put("hora_final", finTexto);
 
                     if (name.isEmpty() || fechaTexto.isEmpty() || inicioTexto.isEmpty() || finTexto.isEmpty()) {
                         Toast.makeText(context, "LLene todos los datos", Toast.LENGTH_SHORT).show();
                     } else {
-                        databaseReference.child(id_auth).child("actividades").setValue(new ActividadItem(id_new, name, fechaTexto, inicioTexto,finTexto));
+                            FirebaseFirestore.getInstance().collection("users").
+                                document(id).collection("actividades").document(id_new).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MainActivity.this, "Actividad registrada", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, "no registrado", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        //databaseReference.child(id_auth).child("actividades").setValue(new ActividadItem(id_new, name, fechaTexto, inicioTexto,finTexto));
                         Toast.makeText(context, "Hecho!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+
+
                     }
                 }
             });

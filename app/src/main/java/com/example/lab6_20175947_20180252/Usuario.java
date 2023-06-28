@@ -42,4 +42,12 @@ public class Usuario {
     public void setContraseña(String contraseña) {
         this.contraseña = contraseña;
     }
+
+    public List<ActividadItem> getActividades() {
+        return actividades;
+    }
+
+    public void setActividades(List<ActividadItem> actividades) {
+        this.actividades = actividades;
+    }
 }

@@ -13,12 +13,20 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Register extends AppCompatActivity {
     EditText editTextEmail,editTextPassword;
@@ -26,6 +34,8 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
 //para realtime :
     FirebaseDatabase firebaseDatabase;
+//PARA CLOUD:
+    FirebaseFirestore mFirestore;
 
 
 
@@ -59,53 +69,82 @@ public class Register extends AppCompatActivity {
                 email_reg=String.valueOf(editTextEmail.getText());
                 password_reg=String.valueOf(editTextPassword.getText());
 
-                if (TextUtils.isEmpty(email_reg)){
-                    Toast.makeText(Register.this,"Ingrese correo",Toast.LENGTH_LONG);
-                    return;
+
+                if ( email_reg.isEmpty() && password_reg.isEmpty()){
+                    Toast.makeText(Register.this, "Complete los datos", Toast.LENGTH_SHORT).show();
+                }else{
+                    registerUser( email_reg, password_reg);
                 }
-                if (TextUtils.isEmpty(password_reg)){
-                    Toast.makeText(Register.this,"Ingrese contraseña",Toast.LENGTH_LONG);
-                    return;
-                }
+
+
+                /*
 //realtime:
+
+
                 DatabaseReference databaseReference=firebaseDatabase.getReference();
                 Usuario usuario = new Usuario();
                 usuario.setCorreo(email_reg);
                 usuario.setContraseña(password_reg);
 
+                // Crea y agrega actividades a la lista de actividades del usuario
+                List<ActividadItem> actividadesList = new ArrayList<>();
+                ActividadItem actividad1 = new ActividadItem("1", "Título 1", "2023-06-27", "10:00", "11:00");
+                ActividadItem actividad2 = new ActividadItem("2", "Título 2", "2023-06-28", "14:00", "15:30");
+                actividadesList.add(actividad1);
+                actividadesList.add(actividad2);
+
+// Asigna la lista de actividades al usuario
+                usuario.setActividades(actividadesList);
+
+                */
+
+//fin realtime
+//inicio cloud
+
+
+//cloud
 
 
 
-                mAuth.createUserWithEmailAndPassword(email_reg, password_reg)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+
+
+
+
+
+
+            }
+        });
+    }
+    private void registerUser( String emailUser, String passUser) {
+        mAuth.createUserWithEmailAndPassword(emailUser, passUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                String id = mAuth.getCurrentUser().getUid();
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", id);
+                map.put("email", emailUser);
+                map.put("password", passUser);
+
+                FirebaseFirestore.getInstance().collection("users").
+                        document(id).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(Register.this, "Cuenta creada mauth", Toast.LENGTH_SHORT).show();
-
-//realtime
-                                    String id =mAuth.getCurrentUser().getUid();//IDENTIFICADOR DEL USUARIO,DEL AUTENTICADOR , PARA REALTIME
-                                    databaseReference.child(id).setValue(usuario).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task2) {
-                                            if(task2.isSuccessful()){
-                                                Toast.makeText(Register.this, "Cuenta creada realtime", Toast.LENGTH_SHORT).show();
-                                                //startActivity(new Intent(Register.this,Login.class));
-                                                //finish();
-
-                                            }else{
-                                                Toast.makeText(Register.this, "No se pudieron crear los datos correctamente", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-
-
-                                } else {
-                                    Toast.makeText(Register.this, "Fallo al registrar", Toast.LENGTH_SHORT).show();
-                                }
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(Register.this, "Registrado en cloud", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Register.this, "Error al registrar", Toast.LENGTH_SHORT).show();
                             }
                         });
 
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Register.this, "Error al registrar", Toast.LENGTH_SHORT).show();
             }
         });
     }
