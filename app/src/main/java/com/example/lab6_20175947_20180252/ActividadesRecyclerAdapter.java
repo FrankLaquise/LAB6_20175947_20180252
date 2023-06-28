@@ -12,6 +12,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -105,13 +106,12 @@ public class ActividadesRecyclerAdapter extends RecyclerView.Adapter<Actividades
 
             EditText textTitulo = dialog.findViewById(R.id.textTitulo);
             EditText textFecha = dialog.findViewById(R.id.textFecha);
-            EditText textHinicio = dialog.findViewById(R.id.textHinicio);
-            EditText textHfin = dialog.findViewById(R.id.textHfin);
+            TimePicker timePickerHinicio = dialog.findViewById(R.id.timePickerHinicio);
+            TimePicker timePickerHfin = dialog.findViewById(R.id.timePickerHfin);
+
 
             textTitulo.setText(titulo);
             textFecha.setText(fecha);
-            textHinicio.setText(hora_inicio);
-            textHinicio.setText(hora_fin);
 
             Button buttonUpdate = dialog.findViewById(R.id.buttonAdd);
             Button buttonCancel = dialog.findViewById(R.id.buttonCancel);
@@ -131,8 +131,14 @@ public class ActividadesRecyclerAdapter extends RecyclerView.Adapter<Actividades
 
                     String newTitulo = textTitulo.getText().toString();
                     String newFecha = textFecha.getText().toString();
-                    String newHinicio = textHinicio.getText().toString();
-                    String newHfin = textHfin.getText().toString();
+                    String newHinicio = timePickerHinicio.getCurrentHour() + ":" + timePickerHinicio.getCurrentMinute();
+                    String newHfin = timePickerHfin.getCurrentHour() + ":" + timePickerHfin.getCurrentMinute();
+
+                    // Obtener las horas y minutos seleccionados en los TimePickers
+                    int horaInicio = timePickerHinicio.getCurrentHour();
+                    int minutoInicio = timePickerHinicio.getCurrentMinute();
+                    int horaFin = timePickerHfin.getCurrentHour();
+                    int minutoFin = timePickerHfin.getCurrentMinute();
 
                     if (titulo.isEmpty() || fecha.isEmpty() || hora_inicio.isEmpty() || hora_fin.isEmpty()) {
                         Toast.makeText(context, "Por favor ingrese toda la data...", Toast.LENGTH_SHORT).show();
@@ -141,9 +147,14 @@ public class ActividadesRecyclerAdapter extends RecyclerView.Adapter<Actividades
                         if (newTitulo.equals(titulo) && newFecha.equals(fecha) && newHinicio.equals(hora_inicio) && newHfin.equals(hora_fin)) {
                             Toast.makeText(context, "no ha hecho ningun cambio", Toast.LENGTH_SHORT).show();
                         } else {
-                            databaseReference.child("USERS").child(id).setValue(new ActividadItem(id, newTitulo, newFecha, newHinicio, newHfin));
-                            Toast.makeText(context, "Se ha actualizadp exitosamente!", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
+                            if (horaInicio > horaFin || (horaInicio == horaFin && minutoInicio >= minutoFin)) {
+                                Toast.makeText(context, "La hora de inicio debe ser anterior a la hora de fin", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                databaseReference.child("USERS").child(id).setValue(new ActividadItem(id, newTitulo, newFecha, newHinicio, newHfin));
+                                Toast.makeText(context, "Se ha actualizadp exitosamente!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
                         }
 
 
@@ -179,7 +190,7 @@ public class ActividadesRecyclerAdapter extends RecyclerView.Adapter<Actividades
                 public void onClick(View view) {
 
                     databaseReference.child("USERS").child(id).removeValue();
-                    Toast.makeText(context, "User Deleted successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Actividad Borrada exitosamente!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
 
                 }

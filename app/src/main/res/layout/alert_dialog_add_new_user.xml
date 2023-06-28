@@ -43,35 +43,49 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/textHinicio"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
+        <TimePicker
+            android:id="@+id/timePickerHinicio"
+            android:layout_width="173dp"
+            android:layout_height="90dp"
             android:layout_gravity="center"
             android:layout_margin="3dp"
             android:background="@drawable/edittext_bg"
-            android:gravity="center"
-            android:hint="Hora inicio"
-            android:padding="5dp"
+            android:scaleX="0.60"
+            android:scaleY="0.60"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/textHfin"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
+        <TimePicker
+            android:id="@+id/timePickerHfin"
+            android:layout_width="169dp"
+            android:layout_height="83dp"
             android:layout_gravity="center"
             android:layout_margin="3dp"
             android:background="@drawable/edittext_bg"
-            android:gravity="center"
-            android:hint="Hora fin"
-            android:padding="5dp"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:scaleY="0.60"
+            android:scaleX="0.60"/>
+
+        <TextView
+            android:id="@+id/textDisponibilidad"
+            android:layout_width="89dp"
+            android:layout_height="49dp"
+            android:textColor="#4CAF50"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textActividadesCruzadas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#F44336"
+            android:visibility="gone" />
+
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonAdd"
