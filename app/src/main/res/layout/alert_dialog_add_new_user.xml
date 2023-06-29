@@ -42,34 +42,34 @@
             android:textColorHint="@android:color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
-
-        <TimePicker
-            android:id="@+id/timePickerHinicio"
-            android:layout_width="173dp"
-            android:layout_height="90dp"
+        <EditText
+            android:id="@+id/textInicio"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_margin="3dp"
             android:background="@drawable/edittext_bg"
-            android:scaleX="0.60"
-            android:scaleY="0.60"
-            android:textColor="@android:color/white"
-            android:textColorHint="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TimePicker
-            android:id="@+id/timePickerHfin"
-            android:layout_width="169dp"
-            android:layout_height="83dp"
-            android:layout_gravity="center"
-            android:layout_margin="3dp"
-            android:background="@drawable/edittext_bg"
+            android:gravity="center"
+            android:hint="Hora Inicio"
+            android:padding="5dp"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:scaleY="0.60"
-            android:scaleX="0.60"/>
+            android:textStyle="bold" />
+        <EditText
+            android:id="@+id/textFin"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="3dp"
+            android:background="@drawable/edittext_bg"
+            android:gravity="center"
+            android:hint="Hora Final"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textDisponibilidad"

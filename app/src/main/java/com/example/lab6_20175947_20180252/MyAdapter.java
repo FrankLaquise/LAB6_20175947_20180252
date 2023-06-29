@@ -103,17 +103,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
             EditText textTitulo = dialog.findViewById(R.id.textTitulo);
             EditText textFecha = dialog.findViewById(R.id.textFecha);
-            TimePicker timePickerHinicio = dialog.findViewById(R.id.timePickerHinicio);
-            TimePicker timePickerHfin = dialog.findViewById(R.id.timePickerHfin);
+            EditText textinicio = dialog.findViewById(R.id.textInicio);
+            EditText texfin = dialog.findViewById(R.id.textFin);
+
 
 
             textTitulo.setText(titulo);
             textFecha.setText(fecha);
+            textinicio.setText(hora_inicio);
+            texfin.setText(hora_fin);
+
 
             Button buttonUpdate = dialog.findViewById(R.id.buttonAdd);
             Button buttonCancel = dialog.findViewById(R.id.buttonCancel);
 
-            buttonUpdate.setText("UPDATE");
+            buttonUpdate.setText("Actualizar");
 
             buttonCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -128,22 +132,32 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
                     String newTitulo = textTitulo.getText().toString();
                     String newFecha = textFecha.getText().toString();
-                    String newHinicio = timePickerHinicio.getCurrentHour() + ":" + timePickerHinicio.getCurrentMinute();
-                    String newHfin = timePickerHfin.getCurrentHour() + ":" + timePickerHfin.getCurrentMinute();
+                    String newInicio = textinicio.getText().toString();
+                    String newFin = texfin.getText().toString();
+
+                    //String newHinicio = timePickerHinicio.getCurrentHour() + ":" + timePickerHinicio.getCurrentMinute();
+                    //String newHfin = timePickerHfin.getCurrentHour() + ":" + timePickerHfin.getCurrentMinute();
 
                     // Obtener las horas y minutos seleccionados en los TimePickers
-                    int horaInicio = timePickerHinicio.getCurrentHour();
+                    /*int horaInicio = timePickerHinicio.getCurrentHour();
                     int minutoInicio = timePickerHinicio.getCurrentMinute();
                     int horaFin = timePickerHfin.getCurrentHour();
                     int minutoFin = timePickerHfin.getCurrentMinute();
-
+*//*
                     Map<String,Object> map = new HashMap<>();
                     map.put("id",id_actividad);
+                    System.out.println(id_actividad);
                     map.put("titulo", newTitulo);
                     map.put("fecha", newFecha);
-                    map.put("hora_inicio", newHinicio);
-                    map.put("hora_fin", newHfin);
+                    map.put("hora_inicio", newInicio);
+                    map.put("hora_fin", newFin);*/
 
+                    String id = auth.getCurrentUser().getUid();
+                    FirebaseFirestore.getInstance().collection("users").
+                            document("mQd3U008QaUhk9fvKAKf7a1r5tH2").collection("actividades").document("activity1688012779718")
+                            .update("titulo",newTitulo,"fecha",newFecha,"hora_inicio",newInicio,"hora_fin",newFin);
+
+                    /*
                     if (titulo.isEmpty() || fecha.isEmpty() || hora_inicio.isEmpty() || hora_fin.isEmpty()) {
                         Toast.makeText(context, "Por favor ingrese toda la data...", Toast.LENGTH_SHORT).show();
                     } else {
@@ -155,9 +169,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                                 Toast.makeText(context, "La hora de inicio debe ser anterior a la hora de fin", Toast.LENGTH_SHORT).show();
 
                             } else {
-                                String id = auth.getCurrentUser().getUid();
-                                FirebaseFirestore.getInstance().collection("users").
-                                        document("mQd3U008QaUhk9fvKAKf7a1r5tH2").collection("actividades").document(id_actividad).update(map);
+
                                 //databaseReference.child("USERS").child(id).setValue(new ActividadItem(id, newTitulo, newFecha, newHinicio, newHfin));
                                 Toast.makeText(context, "Se ha actualizadp exitosamente!", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
@@ -165,7 +177,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         }
 
 
-                    }
+                    }*/
                 }
             });
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
