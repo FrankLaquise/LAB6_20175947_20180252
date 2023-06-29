@@ -53,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    ///nuevo
-    FirebaseAuth mAuth;
+
     RecyclerView recyclerView2;
     ArrayList<ActividadItem> actividadItemArrayList;
     MyAdapter myAdapter;
@@ -119,25 +118,27 @@ public class MainActivity extends AppCompatActivity {
 
 
         recyclerView2=(RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView2.setHasFixedSize(true);
+
         recyclerView2.setLayoutManager(new LinearLayoutManager(this));
 
-        db=FirebaseFirestore.getInstance();
-        actividadItemArrayList=new ArrayList<ActividadItem>();
+
+        actividadItemArrayList=new ArrayList<>();
 
         myAdapter = new MyAdapter(MainActivity.this,actividadItemArrayList);
         recyclerView2.setAdapter(myAdapter);
 
 
+        String id = auth.getCurrentUser().getUid();
 
-        //EventChangeListener();
+        EventChangeListener(id);
+
 
 
 
     }
 
-    private void EventChangeListener() {
-        String id = mAuth.getCurrentUser().getUid();
+    private void EventChangeListener(String id) {
+
         FirebaseFirestore.getInstance().collection("users").document(id).collection("actividades").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -151,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
                         myAdapter.notifyDataSetChanged();
                     }
                 });
+
+
+
                 //.orderBy("fecha", Query.Direction.ASCENDING)
                 /*
         .addSnapshotListener(new EventListener<QuerySnapshot>() {
