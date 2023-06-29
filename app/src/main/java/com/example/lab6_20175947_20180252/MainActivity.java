@@ -1,12 +1,14 @@
 package com.example.lab6_20175947_20180252;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -29,32 +31,44 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    DatabaseReference databaseReference;
 
-    RecyclerView recyclerView;
-    ArrayList<ActividadItem> usersItemArrayList;
-    ActividadesRecyclerAdapter adapter;
-    Button buttonAdd;
+
+
+    ///nuevo
+    FirebaseAuth mAuth;
+    RecyclerView recyclerView2;
+    ArrayList<ActividadItem> actividadItemArrayList;
+    MyAdapter myAdapter;
+    FirebaseFirestore db;
 
 
     ///////////////////////
+    Button buttonAdd;
     FirebaseAuth auth;
     Button logout;
     FirebaseUser user;
     TextView userdetails;
 
+    //
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 //////
 
 
-
+//funciona:
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,32 +115,63 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //readData();
+        //nuevo:
+
+
+        recyclerView2=(RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView2.setHasFixedSize(true);
+        recyclerView2.setLayoutManager(new LinearLayoutManager(this));
+
+        db=FirebaseFirestore.getInstance();
+        actividadItemArrayList=new ArrayList<ActividadItem>();
+
+        myAdapter = new MyAdapter(MainActivity.this,actividadItemArrayList);
+        recyclerView2.setAdapter(myAdapter);
+
+
+
+        //EventChangeListener();
+
+
+
     }
-    private void readData() {
 
+    private void EventChangeListener() {
+        String id = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore.getInstance().collection("users").document(id).collection("actividades").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> list=queryDocumentSnapshots.getDocuments();
+                        for(DocumentSnapshot d:list){
 
-        String id =auth.getCurrentUser().getUid();
-        databaseReference.child(id).child("actividades").addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
+                            ActividadItem obj=d.toObject(ActividadItem.class);
+                            actividadItemArrayList.add(obj);
+                        }
+                        myAdapter.notifyDataSetChanged();
+                    }
+                });
+                //.orderBy("fecha", Query.Direction.ASCENDING)
+                /*
+        .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                usersItemArrayList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    ActividadItem users = dataSnapshot.getValue(ActividadItem.class);
-                    usersItemArrayList.add(users);
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(error != null){
+                    Log.e("Firestore error",error.getMessage());
+                    return;
+
                 }
-                adapter = new ActividadesRecyclerAdapter(MainActivity.this, usersItemArrayList);
-                recyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+                for (DocumentChange dc : value.getDocumentChanges()){
+                    if (dc.getType()==DocumentChange.Type.ADDED){
+                        actividadItemArrayList.add(dc.getDocument().toObject(ActividadItem.class));
+                    }
+                    myAdapter.notifyDataSetChanged();
+                }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+        });*/
     }
+
+
 
     //AGREGAR ACTIVIDAD (VISTA)
     public class ViewDialogAdd {
@@ -172,10 +217,11 @@ public class MainActivity extends AppCompatActivity {
                     //
                     String id = auth.getCurrentUser().getUid();
                     Map<String, Object> map = new HashMap<>();
+                    map.put("id", id_new);
                     map.put("titulo", name);
                     map.put("fecha", fechaTexto);
                     map.put("hora_inicio", inicioTexto);
-                    map.put("hora_final", finTexto);
+                    map.put("hora_fin", finTexto);
 
                     if (name.isEmpty() || fechaTexto.isEmpty() || inicioTexto.isEmpty() || finTexto.isEmpty()) {
                         Toast.makeText(context, "LLene todos los datos", Toast.LENGTH_SHORT).show();
